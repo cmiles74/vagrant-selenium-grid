@@ -1,10 +1,6 @@
 group { "puppet": ensure => "present" }
 
-# install chromium driver for Selenium
 class { 'chromedriver': }
-
-# install firefox
-firefox{ 'installfirefox':}
 
 class selenium {
   # Required for staging module.
@@ -51,6 +47,7 @@ class sehub {
 class senode {
   require selenium
 
+  package { "firefox": ensure => present }
   package { "chromium-browser": ensure => present }
   package { "vnc4server": ensure => present }
 
