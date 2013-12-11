@@ -10,5 +10,6 @@ export DISPLAY=:1
 exec /usr/bin/java -jar /opt/selenium/selenium-server-standalone.jar \
     -role node \
     -hub http://localhost:4444/grid/register \
+    -Dwebdriver.chrome.driver=/usr/local/bin/chromedriver \
     -browser browserName=firefox,version=25.0.1,maxInstances=3,platform=LINUX \
     -browser browserName=chrome,version=31.0.1650.63,maxInstances=3,platform=LINUX
