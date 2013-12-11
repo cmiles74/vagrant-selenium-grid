@@ -5,7 +5,6 @@ Vagrant::Config.run do |config|
   config.vm.box = "debsqueeze64"
   config.vm.box_url = "http://www.emken.biz/vagrant-boxes/debsqueeze64.box"
 
-
   config.vm.define "seleniumhub" do |senodehub|
     # 202 = 0xCA. Easy, eh?
     senodehub.vm.network :hostonly, "172.16.202.120"

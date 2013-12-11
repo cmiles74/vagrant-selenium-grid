@@ -1,5 +1,11 @@
 group { "puppet": ensure => "present" }
 
+# install chromium driver for Selenium
+class { 'chromedriver': }
+
+# install firefox
+firefox{ 'installfirefox':}
+
 class selenium {
   # Required for staging module.
   package { "curl": ensure => present }
@@ -32,20 +38,20 @@ class sehub {
   }
 
   service { "sehub":
-    require => [ 
+    require => [
         File['/etc/init.d/sehub'],
         File['/opt/selenium/sehub']
     ],
     enable => true,
     ensure => running,
   }
-        
+
 }
 
 class senode {
   require selenium
-  
-  package { "iceweasel": ensure => present }
+
+  package { "chromium-browser": ensure => present }
   package { "vnc4server": ensure => present }
 
   file { "/opt/selenium/senode":
@@ -71,7 +77,7 @@ class senode {
   }
 
   service { "senode":
-    require => [ 
+    require => [
         User['senode'],
         File['/etc/init.d/senode'],
         File['/opt/selenium/senode']
@@ -79,7 +85,7 @@ class senode {
     enable => true,
     ensure => running,
   }
-        
+
   file { "/etc/init.d/senodevnc":
       source => "/vagrant/files/etc/init.d/senodevnc",
       owner => "root",
@@ -109,7 +115,7 @@ class senode {
 
   service { "senodevnc":
     require => [
-       File['/etc/init.d/senode'], 
+       File['/etc/init.d/senode'],
        File['/home/senode/.vnc/xstartup'],
        File['/home/senode/.vnc/passwd'],
        User['senode']
@@ -119,4 +125,3 @@ class senode {
   }
 
 }
-
