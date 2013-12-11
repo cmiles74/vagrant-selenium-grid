@@ -1,12 +1,45 @@
 group { "puppet": ensure => "present" }
 
+package { "curl": ensure => present }
+package { "unzip": ensure => present }
+
 class { 'chromedriver': }
+
+class phantomjs {
+
+  $version      = '1.9.2'
+  $basename     = "phantomjs-${version}-linux-i686"
+  $tarball      = "${basename}.tar.bz2"
+  $tarball_path = "/tmp/${tarball}"
+  $url          = "http://phantomjs.googlecode.com/files/${tarball}"
+  $destdir      = "/opt/${basename}"
+
+  package {
+    'phantomjs':  ensure => absent;
+  }
+
+  exec {
+    'download-phantomjs-binary':
+      command => "/usr/bin/curl -L -o ${tarball_path} ${url}",
+      creates => $tarball_path;
+
+    'unpack-phantomjs-binary':
+      command => "/bin/tar jxf ${tarball_path}",
+      cwd     => '/opt',
+      creates => $destdir,
+      require => Exec['download-phantomjs-binary'];
+  }
+
+  file {
+    '/usr/local/bin/phantomjs':
+      ensure  => link,
+      target  => "${destdir}/bin/phantomjs",
+      require => Exec['unpack-phantomjs-binary'];
+  }
+}
 
 class selenium {
   # Required for staging module.
-  package { "curl": ensure => present }
-  package { "unzip": ensure => present }
-
   package { "openjdk-6-jre-headless": ensure => present }
 
   file { "/opt/selenium":
@@ -46,6 +79,7 @@ class sehub {
 
 class senode {
   require selenium
+  require phantomjs
 
   package { "firefox": ensure => present }
   package { "chromium-browser": ensure => present }
@@ -77,7 +111,8 @@ class senode {
     require => [
         User['senode'],
         File['/etc/init.d/senode'],
-        File['/opt/selenium/senode']
+        File['/opt/selenium/senode'],
+	File['/usr/local/bin/phantomjs'],
     ],
     enable => true,
     ensure => running,
